@@ -1,4 +1,8 @@
-mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD -D $MYSQL_DATABASE < /app/apache-tomcat-8.5.38/webapps/reportserver/ddl/reportserver-RS3.0.6-6006-schema-MySQL5_CREATE.sql
+while [ "$(curl mysql:3306 &> /dev/null ; echo $?)" != "0" ]; do sleep 5; done
+if [ $(echo 'show tables;' | mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD -D $MYSQL_DATABASE | grep -c RS_USER) -eq 0 ]; then
+    sql=$(find . -name '*MySQL5_CREATE.sql')
+    mysql -h mysql -u $MYSQL_USER -p$MYSQL_PASSWORD -D $MYSQL_DATABASE < $sql
+fi
 
 cat > /app/apache-tomcat-8.5.38/webapps/reportserver/WEB-INF/classes/persistence.properties <<HERE
 hibernate.connection.username=$MYSQL_USER
